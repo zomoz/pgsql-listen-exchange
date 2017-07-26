@@ -463,8 +463,12 @@ get_pgsql_dsn(X) ->
   User = get_param(X, "user", ?DEFAULT_USER),
   Password = get_param(X, "password", ?DEFAULT_PASSWORD),
   DBName = get_param(X, "dbname", ?DEFAULT_DBNAME),
+  SSL = get_param(X, "ssl", ?DEFAULT_SSL),
+  SSL_opts_string = get_param(X, "ssl-opts", ?DEFAULT_SSL_OPTS),
+  {ok, SSL_opts_scanned, _} = erl_scan:string(binary_to_list(SSL_opts_string)),
+  {ok, SSL_opts} = erl_parse:parse_term(SSL_opts_scanned ++ [{dot,0}]),
   #pgsql_listen_dsn{host=Host, port=Port, user=User, password=Password,
-                    dbname=DBName}.
+                    dbname=DBName, ssl=SSL, ssl_opts=SSL_opts}.
 
 %% @private
 %% @spec get_pgsql_server(DSN) -> binary()

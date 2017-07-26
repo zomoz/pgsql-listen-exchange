@@ -17,6 +17,8 @@
 -define(DEFAULT_USER, <<"postgres">>).
 -define(DEFAULT_PASSWORD, <<"">>).
 -define(DEFAULT_DBNAME, <<"postgres">>).
+-define(DEFAULT_SSL, true).
+-define(DEFAULT_SSL_OPTS, <<"{verify, verify_none}">>).
 
 -record(pgsql_listen_conn, {pid, server, dbname}).
 -record(pgsql_listen_dsn, {host, port, user, password, dbname}).
