@@ -528,8 +528,12 @@ get_pgsql_port(_) ->
 %% @doc Return the value passed in as a tuple of SSL options for epgsql
 %% @end
 %%
-get_pgsql_ssl_opts(Value) ->
-  {ok, Scanned, _} = erl_scan:string(binary_to_list(Value)),
+get_pgsql_ssl_opts(Value) when is_binary(Value) ->
+  List = if
+    is_binary(Value) -> binary_to_list(Value);
+    true -> Value
+  end,
+  {ok, Scanned, _} = erl_scan:string(List),
   {ok, Parsed} = erl_parse:parse_term(Scanned ++ [{dot,0}]),
   Parsed.
 
