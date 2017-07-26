@@ -37,7 +37,9 @@ connect(#pgsql_listen_dsn{host=Host, port=Port, user=User,
    epgsql:connect(Host, User, Password, [{database, DBName},
                                          {port, Port},
                                          {timeout, 2500},
-                                         {async, self()}]).
+                                         {async, self()},
+                                         {ssl, true},
+                                         {ssl_opts, {verify, verify_none}}]).
 
 %% @spec listen(Connection, Channel) -> Result
 %% @where
