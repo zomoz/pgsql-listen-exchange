@@ -48,7 +48,7 @@ connect(#pgsql_listen_dsn{host=Host, port=Port, user=User,
 %% @end
 %%
 listen(Connection, Channel) ->
-  query(Connection, "LISTEN " ++ Channel).
+  query(Connection, "LISTEN \"" ++ Channel ++ "\"").
 
 %% @spec unlisten(Connection, Channel) -> Result
 %% @where

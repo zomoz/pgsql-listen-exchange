@@ -83,7 +83,7 @@ publish_notification(Conn, Channel, Payload, State) ->
 
   Properties = #properties{content_encoding=get_binding_longstr(Key, Channel, <<"content_encoding">>),
                            content_type=get_binding_longstr(Key, Channel, <<"content_type">>),
-                           delivery_mode=get_delivery_mode(Key, Channel),
+                           delivery_mode=2,
                            headers=Headers,
                            priority=get_binding_long(Key, Channel, <<"priority">>),
                            reply_to=get_binding_longstr(Key, Channel, <<"reply_to">>),
