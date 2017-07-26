@@ -226,6 +226,32 @@ validate_pgsql_user(none) ->
 validate_pgsql_user(Value) ->
   validate_binary_or_none("pgsql-listen-user", Value).
 
+%% @spec validate_pgsql_ssl(Value) -> Result
+%% @where
+%%       Value  = boolean|none
+%%       Result = ok|{error, Error}
+%% @doc Validate the user specified PostgreSQL SSL is a boolean or none
+%% @end
+%%
+validate_pgsql_ssl(none) ->
+  ok;
+validate_pgsql_ssl(Value) when is_boolean(Value) ->
+  ok;
+validate_pgsql_ssl(Value) ->
+  {error, "pgsql-listen-ssl should be a boolean, actually was ~p", [Value]}.
+
+%% @spec validate_pgsql_ssl_opts(Value) -> Result
+%% @where
+%%       Value  = binary()|none
+%%       Result = ok|{error, Error}
+%% @doc Validate the user specified PostgreSQL ssl_opts is a binary value or none
+%% @end
+%%
+validate_pgsql_ssl_opts(none) ->
+  ok;
+validate_pgsql_ssl_opts(Value) ->
+  validate_binary_or_none("pgsql-listen-ssl-opts", Value).
+
 %% ---------------
 %% Private Methods
 %% ---------------

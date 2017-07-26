@@ -8,4 +8,6 @@ validate_policy_ok_test() ->
              {<<"pgsql-listen-dbname">>, <<"dbname">>},
              {<<"pgsql-listen-user">>, <<"user">>},
              {<<"pgsql-listen-password">>, <<"password">>}],
+             {<<"pgsql-listen-ssl">>, true},
+             {<<"pgsql-listen-ssl-opts">>, <<"{verify,verify_none}">>}],
   ?assertEqual(ok, pgsql_listen_parameters:validate_policy(KeyList)).
