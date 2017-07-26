@@ -492,9 +492,7 @@ get_pgsql_dsn(X) ->
   Password = get_param(X, "password", ?DEFAULT_PASSWORD),
   DBName = get_param(X, "dbname", ?DEFAULT_DBNAME),
   SSL = get_param(X, "ssl", ?DEFAULT_SSL),
-  SSL_opts_string = get_param(X, "ssl-opts", ?DEFAULT_SSL_OPTS),
-  {ok, SSL_opts_scanned, _} = erl_scan:string(binary_to_list(SSL_opts_string)),
-  {ok, SSL_opts} = erl_parse:parse_term(SSL_opts_scanned ++ [{dot,0}]),
+  SSL_opts = get_pgsql_ssl_opts(get_param(X, "ssl-opts", ?DEFAULT_SSL_OPTS)),
   #pgsql_listen_dsn{host=Host, port=Port, user=User, password=Password,
                     dbname=DBName, ssl=SSL, ssl_opts=SSL_opts}.
 
@@ -522,6 +520,18 @@ get_pgsql_port(Value) when is_number(Value) ->
   Value;
 get_pgsql_port(_) ->
   5432.
+
+%% @private
+%% @spec get_pgsql_ssl_opts(Value) -> tuple()
+%% @where
+%%       Value = binary()
+%% @doc Return the value passed in as a tuple of SSL options for epgsql
+%% @end
+%%
+get_pgsql_ssl_opts(Value) ->
+  {ok, Scanned, _} = erl_scan:string(binary_to_list(Value)),
+  {ok, Parsed} = erl_parse:parse_term(Scanned ++ [{dot,0}]),
+  Parsed.
 
 %% @private
 %% @spec is_pgsql_listen_exchange(Exchange) -> Result
