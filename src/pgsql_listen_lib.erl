@@ -20,7 +20,9 @@
          validate_pgsql_port/1,
          validate_pgsql_dbname/1,
          validate_pgsql_user/1,
-         validate_pgsql_password/1]).
+         validate_pgsql_password/1,
+         validate_pgsql_ssl/1,
+         validate_pgsql_ssl_opts/1]).
 
 -include_lib("amqp_client/include/amqp_client.hrl").
 
