@@ -361,7 +361,8 @@ get_binding_longstr(Exchange, Channel, Key) ->
 %% @private
 get_delivery_mode(Exchange, Channel) ->
   case get_binding_long(Exchange, Channel, <<"delivery_mode">>) of
-    Value when lists:member(Value, [1, 2]) -> Value;
+    1 -> 1;
+    2 -> 2;
     null -> 1;
     _ -> 1
   end.
