@@ -340,6 +340,7 @@ get_binding_long(Exchange, Channel, Key) ->
     {ok, Args} ->
       case get_args_key(Key, 1, Args) of
         {_, long, Value} -> Value;
+        {_, Value} -> Value;
         false -> null;
         _ -> null
       end;
@@ -352,6 +353,7 @@ get_binding_longstr(Exchange, Channel, Key) ->
     {ok, Args} ->
       case get_args_key(Key, 1, Args) of
         {_, longstr, Value} -> Value;
+        {_, Value} -> Value;
         false -> null;
         _ -> null
       end;
