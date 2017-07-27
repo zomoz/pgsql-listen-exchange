@@ -17,9 +17,11 @@
 -define(DEFAULT_USER, <<"postgres">>).
 -define(DEFAULT_PASSWORD, <<"">>).
 -define(DEFAULT_DBNAME, <<"postgres">>).
+-define(DEFAULT_SSL, false).
+-define(DEFAULT_SSL_OPTS, <<"{}">>).
 
 -record(pgsql_listen_conn, {pid, server, dbname}).
--record(pgsql_listen_dsn, {host, port, user, password, dbname}).
+-record(pgsql_listen_dsn, {host, port, user, password, dbname, ssl, ssl_opts}).
 -record(pgsql_listen_state, {amqp, channels, pgsql}).
 -record(properties, {app_id, content_type, content_encoding, delivery_mode,
                      headers, priority, reply_to, type}).

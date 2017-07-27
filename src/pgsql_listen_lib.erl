@@ -20,7 +20,9 @@
          validate_pgsql_port/1,
          validate_pgsql_dbname/1,
          validate_pgsql_user/1,
-         validate_pgsql_password/1]).
+         validate_pgsql_password/1,
+         validate_pgsql_ssl/1,
+         validate_pgsql_ssl_opts/1]).
 
 -include_lib("amqp_client/include/amqp_client.hrl").
 
@@ -225,6 +227,32 @@ validate_pgsql_user(none) ->
   ok;
 validate_pgsql_user(Value) ->
   validate_binary_or_none("pgsql-listen-user", Value).
+
+%% @spec validate_pgsql_ssl(Value) -> Result
+%% @where
+%%       Value  = boolean|none
+%%       Result = ok|{error, Error}
+%% @doc Validate the user specified PostgreSQL SSL is a boolean or none
+%% @end
+%%
+validate_pgsql_ssl(none) ->
+  ok;
+validate_pgsql_ssl(Value) when is_boolean(Value) ->
+  ok;
+validate_pgsql_ssl(Value) ->
+  {error, "pgsql-listen-ssl should be a boolean, actually was ~p", [Value]}.
+
+%% @spec validate_pgsql_ssl_opts(Value) -> Result
+%% @where
+%%       Value  = binary()|none
+%%       Result = ok|{error, Error}
+%% @doc Validate the user specified PostgreSQL ssl_opts is a binary value or none
+%% @end
+%%
+validate_pgsql_ssl_opts(none) ->
+  ok;
+validate_pgsql_ssl_opts(Value) ->
+  validate_binary_or_none("pgsql-listen-ssl-opts", Value).
 
 %% ---------------
 %% Private Methods
@@ -463,8 +491,10 @@ get_pgsql_dsn(X) ->
   User = get_param(X, "user", ?DEFAULT_USER),
   Password = get_param(X, "password", ?DEFAULT_PASSWORD),
   DBName = get_param(X, "dbname", ?DEFAULT_DBNAME),
+  SSL = get_param(X, "ssl", ?DEFAULT_SSL),
+  SSL_opts = get_pgsql_ssl_opts(get_param(X, "ssl-opts", ?DEFAULT_SSL_OPTS)),
   #pgsql_listen_dsn{host=Host, port=Port, user=User, password=Password,
-                    dbname=DBName}.
+                    dbname=DBName, ssl=SSL, ssl_opts=SSL_opts}.
 
 %% @private
 %% @spec get_pgsql_server(DSN) -> binary()
@@ -490,6 +520,22 @@ get_pgsql_port(Value) when is_number(Value) ->
   Value;
 get_pgsql_port(_) ->
   5432.
+
+%% @private
+%% @spec get_pgsql_ssl_opts(Value) -> tuple()
+%% @where
+%%       Value = binary()
+%% @doc Return the value passed in as a tuple of SSL options for epgsql
+%% @end
+%%
+get_pgsql_ssl_opts(Value) ->
+  List = if
+    is_binary(Value) -> binary_to_list(Value);
+    true -> Value
+  end,
+  {ok, Scanned, _} = erl_scan:string(List),
+  {ok, Parsed} = erl_parse:parse_term(Scanned ++ [{dot,0}]),
+  Parsed.
 
 %% @private
 %% @spec is_pgsql_listen_exchange(Exchange) -> Result
