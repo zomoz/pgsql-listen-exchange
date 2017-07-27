@@ -528,7 +528,7 @@ get_pgsql_port(_) ->
 %% @doc Return the value passed in as a tuple of SSL options for epgsql
 %% @end
 %%
-get_pgsql_ssl_opts(Value) when is_binary(Value) ->
+get_pgsql_ssl_opts(Value) ->
   List = if
     is_binary(Value) -> binary_to_list(Value);
     true -> Value
