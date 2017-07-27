@@ -338,7 +338,7 @@ ensure_pgsql_connection(X=#exchange{name=Name}, PgSQL) ->
 get_binding_long(Exchange, Channel, Key) ->
   case get_binding_args(Exchange, Channel) of
     {ok, Args} ->
-      case lists:keyfind(Key, 1, Args) of
+      case get_args_key(Key, 1, Args) of
         {_, long, Value} -> Value;
         false -> null;
         _ -> null
@@ -350,7 +350,7 @@ get_binding_long(Exchange, Channel, Key) ->
 get_binding_longstr(Exchange, Channel, Key) ->
   case get_binding_args(Exchange, Channel) of
     {ok, Args} ->
-      case lists:keyfind(Key, 1, Args) of
+      case get_args_key(Key, 1, Args) of
         {_, longstr, Value} -> Value;
         false -> null;
         _ -> null
@@ -360,15 +360,19 @@ get_binding_longstr(Exchange, Channel, Key) ->
 
 %% @private
 get_delivery_mode(Exchange, Channel) ->
-  case get_binding_args(Exchange, Channel) of
-    {ok, Args} ->
-      case lists:keyfind(<<"delivery_mode">>, 1, Args) of
-        {_, long, Value} when Value >= 1, Value =< 2 -> Value;
-        false -> 1;
-        _ -> 1
-      end;
-    {err, not_found} -> 1
-   end.
+  case get_binding_long(Exchange, Channel, <<"delivery_mode">>) of
+    Value when lists:member(Value, [1, 2]) -> Value;
+    null -> 1;
+    _ -> 1
+  end.
+
+%% @private
+get_args_key(Key, Size, Args) ->
+  case lists:keyfind(Key, Size, Args) of
+    Result -> Result;
+    false when is_binary(Key) -> lists:keyfind(binary_to_list(Key), Size, Args); % retry with list()
+    false -> false
+  end.
 
 %% @private
 get_binding_args(Exchange, Channel) ->
