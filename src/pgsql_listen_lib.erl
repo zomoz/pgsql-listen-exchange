@@ -370,9 +370,8 @@ get_delivery_mode(Exchange, Channel) ->
 %% @private
 get_args_key(Key, Size, Args) ->
   case lists:keyfind(Key, Size, Args) of
-    Result -> Result;
     false when is_binary(Key) -> lists:keyfind(binary_to_list(Key), Size, Args); % retry with list()
-    false -> false
+    Result -> Result
   end.
 
 %% @private
