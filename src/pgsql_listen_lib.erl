@@ -85,7 +85,7 @@ publish_notification(Conn, Channel, Payload, State) ->
 
   Properties = #properties{content_encoding=get_binding_longstr(Key, Channel, <<"content_encoding">>),
                            content_type=get_binding_longstr(Key, Channel, <<"content_type">>),
-                           delivery_mode=2,
+                           delivery_mode=get_delivery_mode(Key, Channel),
                            headers=Headers,
                            priority=get_binding_long(Key, Channel, <<"priority">>),
                            reply_to=get_binding_longstr(Key, Channel, <<"reply_to">>),
@@ -338,8 +338,9 @@ ensure_pgsql_connection(X=#exchange{name=Name}, PgSQL) ->
 get_binding_long(Exchange, Channel, Key) ->
   case get_binding_args(Exchange, Channel) of
     {ok, Args} ->
-      case lists:keyfind(Key, 1, Args) of
+      case get_args_key(Key, 1, Args) of
         {_, long, Value} -> Value;
+        {_, Value} -> Value;
         false -> null;
         _ -> null
       end;
@@ -350,8 +351,9 @@ get_binding_long(Exchange, Channel, Key) ->
 get_binding_longstr(Exchange, Channel, Key) ->
   case get_binding_args(Exchange, Channel) of
     {ok, Args} ->
-      case lists:keyfind(Key, 1, Args) of
+      case get_args_key(Key, 1, Args) of
         {_, longstr, Value} -> Value;
+        {_, Value} -> Value;
         false -> null;
         _ -> null
       end;
@@ -360,15 +362,19 @@ get_binding_longstr(Exchange, Channel, Key) ->
 
 %% @private
 get_delivery_mode(Exchange, Channel) ->
-  case get_binding_args(Exchange, Channel) of
-    {ok, Args} ->
-      case lists:keyfind(<<"delivery_mode">>, 1, Args) of
-        {_, long, Value} when Value >= 1, Value =< 2 -> Value;
-        false -> 1;
-        _ -> 1
-      end;
-    {err, not_found} -> 1
-   end.
+  case get_binding_long(Exchange, Channel, <<"delivery_mode">>) of
+    1 -> 1;
+    2 -> 2;
+    null -> 1;
+    _ -> 1
+  end.
+
+%% @private
+get_args_key(Key, Size, Args) ->
+  case lists:keyfind(Key, Size, Args) of
+    false when is_binary(Key) -> lists:keyfind(binary_to_list(Key), Size, Args); % retry with list()
+    Result -> Result
+  end.
 
 %% @private
 get_binding_args(Exchange, Channel) ->
