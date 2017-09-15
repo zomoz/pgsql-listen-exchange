@@ -20,7 +20,9 @@
          {policy_validator,  <<"pgsql-listen-port">>},
          {policy_validator,  <<"pgsql-listen-dbname">>},
          {policy_validator,  <<"pgsql-listen-user">>},
-         {policy_validator,  <<"pgsql-listen-password">>}]).
+         {policy_validator,  <<"pgsql-listen-password">>},
+         {policy_validator,  <<"pgsql-listen-ssl">>},
+         {policy_validator,  <<"pgsql-listen-ssl-opts">>}]).
 
 -rabbit_boot_step({?MODULE,
                    [{description, "pgsql-listen parameters"},
@@ -45,16 +47,22 @@ validate_policy(KeyList) ->
   DBName   = proplists:get_value(<<"pgsql-listen-dbname">>, KeyList, none),
   User     = proplists:get_value(<<"pgsql-listen-user">>, KeyList, none),
   Password = proplists:get_value(<<"pgsql-listen-password">>, KeyList, none),
+  SSL      = proplists:get_value(<<"pgsql-listen-ssl">>, KeyList, none),
+  SSL_opts = proplists:get_value(<<"pgsql-listen-ssl-opts">>, KeyList, none),
   Validation = [pgsql_listen_lib:validate_pgsql_host(Host),
                 pgsql_listen_lib:validate_pgsql_port(Port),
                 pgsql_listen_lib:validate_pgsql_dbname(DBName),
                 pgsql_listen_lib:validate_pgsql_user(User),
-                pgsql_listen_lib:validate_pgsql_password(Password)],
+                pgsql_listen_lib:validate_pgsql_password(Password),
+                pgsql_listen_lib:validate_pgsql_ssl(SSL),
+                pgsql_listen_lib:validate_pgsql_ssl_opts(SSL_opts)],
   case Validation of
-    [ok, ok, ok, ok, ok]                   -> ok;
-    [{error, Error, Args}, _, _, _, _]     -> {error, Error, Args};
-    [ok, {error, Error, Args}, _, _, _]    -> {error, Error, Args};
-    [ok, ok, {error, Error, Args}, _, _]   -> {error, Error, Args};
-    [ok, ok, ok, {error, Error, Args}, _]  -> {error, Error, Args};
-    [ok, ok, ok, ok, {error, Error, Args}] -> {error, Error, Args}
+    [ok, ok, ok, ok, ok, ok, ok]                   -> ok;
+    [{error, Error, Args}, _, _, _, _, _, _]       -> {error, Error, Args};
+    [ok, {error, Error, Args}, _, _, _, _, _]      -> {error, Error, Args};
+    [ok, ok, {error, Error, Args}, _, _, _, _]     -> {error, Error, Args};
+    [ok, ok, ok, {error, Error, Args}, _, _, _]    -> {error, Error, Args};
+    [ok, ok, ok, ok, {error, Error, Args}, _, _]   -> {error, Error, Args};
+    [ok, ok, ok, ok, ok, {error, Error, Args}, _]  -> {error, Error, Args};
+    [ok, ok, ok, ok, ok, ok, {error, Error, Args}] -> {error, Error, Args}
   end.
